@@ -1,11 +1,11 @@
 ## chartjs-plugin-funnel-label
-Plugin for Chart.js to add labels between columns to show the % progress in the same dataset. **Chart.js 2.6.0 or above** required.
+Plugin for **Chart.js** to add labels between columns to show the *% progress* in the same dataset. **Chart.js 2.6.0 or above** required.
 
 ### Starting
 
 Add the **chartjs-plugin-funnel-label.js** and use the **funnel_labels** options to enable the plugin and override the default values.
 
-It works only in **bar charts** with one dataset and will show the % difference between the **first** bar and the **current** bar.
+It works only in **bar charts** with one dataset and will show the % difference between the **first** bar and the **current** one.
 
 ```markdown
 new Chart($("#chart"), {
@@ -56,3 +56,7 @@ label_options: {
 }
 ```
 
+### Known issues
+
+- A small *barPercentage* is recommended to avoid some overlapping while drawing.
+- The label value can be setted only as a *% difference* between the first and the current values. No other options are available.

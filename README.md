@@ -1,5 +1,10 @@
 ## chartjs-plugin-funnel-label
+
 Plugin for **Chart.js** to add labels between columns to show the *% progress* in the same dataset. **Chart.js 2.6.0 or above** required.
+
+Written by [Albert Gonzalez](http://albertgonzalez.coffee) and released under [the Unlicense](http://unlicense.org/).
+
+[See it in action!](http://albertgonzalez.coffee/projects/chartjs-plugin-funnel-labels/)
 
 ### Starting
 

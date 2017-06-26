@@ -77,7 +77,7 @@ Chart.plugins.register({
 		if (chart.data.datasets.length > 0) {
 			var meta = chart.getDatasetMeta(0);
 
-			if (!meta.hidden) {
+			if (!meta.hidden && chart.data.datasets.length == 1) {
 
 				var first_value = chart.data.datasets[0].data[0];
 

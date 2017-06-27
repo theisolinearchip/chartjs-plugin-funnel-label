@@ -18,13 +18,13 @@ Chart.plugins.register({
 		var ctx = chart.ctx;
 		var position = element.getCenterPoint();
 
-		var font_size = Math.min(chart.width * this.label_options.default_font_size / this.label_options.default_width, this.label_options.default_font_size);
-		var padding = Math.min(chart.width * this.label_options.default_padding / this.label_options.default_width, this.label_options.default_padding);
-		var arrow_width = Math.min(chart.width * this.label_options.default_arrow_width / this.label_options.default_width, this.label_options.default_arrow_width);
+		var font_size = Math.min(chart.width * this.get_option(chart, "default_font_size") / this.get_option(chart, "default_width"), this.get_option(chart, "default_font_size"));
+		var padding = Math.min(chart.width * this.get_option(chart, "default_padding") / this.get_option(chart, "default_width"), this.get_option(chart, "default_padding"));
+		var arrow_width = Math.min(chart.width * this.get_option(chart, "default_arrow_width") / this.get_option(chart, "default_width"), this.get_option(chart, "default_arrow_width"));
 
 		ctx.save();
 
-		ctx.font = Chart.helpers.fontString(font_size, this.label_options.font_style, this.label_options.font_family);
+		ctx.font = Chart.helpers.fontString(font_size, this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
 		ctx.textBaseline = 'top';
 		ctx.textAlign = 'left';
 
@@ -49,7 +49,7 @@ Chart.plugins.register({
 		var box_margin_x = Math.min(element._model.width, 100);
 
 		// draw the box		
-		ctx.fillStyle = this.label_options.background_color;
+		ctx.fillStyle = this.get_option(chart, "background_color");
 		ctx.fillRect(x_rectangle - box_margin_x,
 					y_rectangle,
 					width_rectangle,
@@ -63,7 +63,7 @@ Chart.plugins.register({
 		ctx.fill();
 
 		// draw the text
-		ctx.fillStyle = this.label_options.font_color;
+		ctx.fillStyle = this.get_option(chart, "font_color");
 		ctx.fillText(text, x_rectangle - box_margin_x + padding, y_rectangle + padding);
 
 		ctx.restore();
@@ -86,7 +86,7 @@ Chart.plugins.register({
 					if (index > 0) {
 						var value = Math.round(chart.data.datasets[0].data[index] * 100 / first_value);
 
-						if (value > 0 || that.label_options.show_zeros) {
+						if (value > 0 || that.get_option(chart, "show_zeros")) {
 							that.draw_single_label(chart, value + "%", element);
 						}
 
@@ -97,24 +97,31 @@ Chart.plugins.register({
 
 	},
 
-	afterInit: function(chart) {
-		// Set custom values instead of the default ones
-		if (typeof (chart.options.funnel_labels) != "undefined" ) {
-			for (var index in chart.options.funnel_labels) {
-				this.label_options[index] = chart.options.funnel_labels[index];
+	get_option: function(chart, option) {
+		if (typeof(this.label_options[option]) != "undefined") {
+			if ( (typeof(chart.options.funnel_labels) != "undefined") && (typeof(chart.options.funnel_labels[option]) != "undefined") ) {
+				option_value = chart.options.funnel_labels[option];
+			} else {
+				option_value = this.label_options[option];
 			}
-		}
+		} else option_value = "";
+
+		return option_value;
+	},
+
+	afterInit: function(chart) {
+
 	},
 
 	afterDatasetsDraw: function(chart, easing) {
 		// To only draw at the end of animation, check for easing === 1
-		if (this.label_options.enabled) {
+		if (this.get_option(chart, "enabled")) {
 			this.calculate_labels(chart);
 		}
 	},
 
 	resize: function(chart) {
-		if (this.label_options.enabled) {
+		if (this.get_option(chart, "enabled")) {
 			this.calculate_labels(chart);
 		}
 	}

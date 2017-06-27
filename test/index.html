@@ -1,0 +1,78 @@
+<html>
+	
+	<head>
+
+		<meta charset="utf-8">
+		
+		<title>chartjs-plugin-funnel-labels</title>
+
+		<style>
+
+			body {
+				padding: 10px;
+				font-family: sans-serif;
+			}
+
+			.chart_box {
+				padding: 40px;
+				width: 70%;
+				height: 70%;
+				clear:both;
+			}
+
+		</style>
+			
+	</head>
+
+	<body>
+
+		<h1>chartjs-plugin-funnel-labels</h1>
+
+		<p>Plugin for Chart.js to add labels between columns to show the % progress in the same dataset. <a href="https://github.com/koopaconan/chartjs-plugin-funnel-label">Source code available on Github</a>.</p>
+
+		<a href="http://albertgonzalez.coffee">< Back</a>
+
+		<div class="chart_box">
+			<canvas id="chart">
+
+			</canvas>
+		</div>
+
+		<script src="jquery.min.js"></script>
+		<script src="Chart.min.js"></script>
+		<script src="chartjs-plugin-funnel-labels.js"></script>
+		<script>
+			$(document).ready(function() {
+				new Chart($("#chart"), {
+					type: 'bar',
+					data: {
+						labels: ["Alpha Value", "Beta Value", "Charlie Value", "Delta Value"],
+						datasets: [{
+							label: 'Awesome Dataset',
+							data: [555, 302, 175, 50],
+							backgroundColor: "rgba(75, 192, 192, 1)"
+						}]
+					},
+					options: {
+						scales: {
+							yAxes: [{
+								ticks: {
+									beginAtZero: true
+								}
+							}],
+							xAxes: [{
+								barPercentage: 0.3
+							}]
+						},
+						funnel_labels: {
+							enabled: true,
+							background_color: "red"
+						}
+					}
+				});
+			});
+		</script>
+
+	</body>
+
+</html>

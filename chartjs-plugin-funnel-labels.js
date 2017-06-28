@@ -6,67 +6,105 @@ Chart.plugins.register({
 		font_family: "Arial",
 		font_color: "white",
 		background_color: "#FFBA4B",
-		default_width: 1150,
-		default_font_size: 20,
-		default_padding: 10,
-		default_arrow_width: 20,
-		show_zeros: true
+		rectangle_width_scale_factor: 5,
+		show_zeros: true,
+		min_width_upper_label: 150,
+		allow_upper_label: true,
+		force_upper_label: false,
 	},
 
-	draw_single_label: function(chart, text, element) {
-
+	draw_left_label: function(chart, text, x_previous, x_current, y_current) {
 		var ctx = chart.ctx;
-		var position = element.getCenterPoint();
+		var available_width = x_current - x_previous;
 
-		var font_size = Math.min(chart.width * this.get_option(chart, "default_font_size") / this.get_option(chart, "default_width"), this.get_option(chart, "default_font_size"));
-		var padding = Math.min(chart.width * this.get_option(chart, "default_padding") / this.get_option(chart, "default_width"), this.get_option(chart, "default_padding"));
-		var arrow_width = Math.min(chart.width * this.get_option(chart, "default_arrow_width") / this.get_option(chart, "default_width"), this.get_option(chart, "default_arrow_width"));
+		var rectangle_width = available_width / this.get_option(chart, "rectangle_width_scale_factor");
+		var triangle_width = rectangle_width / 3;
 
-		ctx.save();
+		var padding = rectangle_width / 5;
+		var font_size = rectangle_width / 3;
 
 		ctx.font = Chart.helpers.fontString(font_size, this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
-		ctx.textBaseline = 'top';
-		ctx.textAlign = 'left';
+		ctx.textBaseline = "top";
+		ctx.textAlign = "center";
 
-		var width_text = ctx.measureText(text).width;
+		var common_height = font_size + padding * 2;
+		var x_rectangle = x_previous + (available_width / 2) - ((rectangle_width + triangle_width) / 2);
+		var y_rectangle = y_current - common_height / 2;
 
-		var x_rectangle = (position.x - element._model.width / 2 - width_text - padding * 2);
-		var y_rectangle = position.y - padding;
-		var height_rectangle = parseInt(font_size) + padding * 2;
-		var width_rectangle = width_text + padding * 2;
-
-		// Min height
-		if (y_rectangle + height_rectangle >= chart.chart.chartArea.bottom) {
-			y_rectangle = chart.chart.chartArea.bottom - height_rectangle - 5;
+		// Min y position
+		if (y_rectangle + common_height >= chart.chart.chartArea.bottom) {
+			y_rectangle = chart.chart.chartArea.bottom - common_height - 5;
 		}
 
 		// Arrow (triangle)
-		var x_triangle = x_rectangle + width_rectangle - 1;
+		var x_triangle = x_rectangle + rectangle_width - 1;
 		var y_triangle = y_rectangle;
-		var height_triangle = parseInt(font_size) + padding * 2;
 
-		// Space between the full box and the chart (X only)
-		var box_margin_x = Math.min(element._model.width, 100);
+		ctx.save();
 
 		// draw the box		
 		ctx.fillStyle = this.get_option(chart, "background_color");
-		ctx.fillRect(x_rectangle - box_margin_x,
+		ctx.fillRect(x_rectangle,
 					y_rectangle,
-					width_rectangle,
-					height_rectangle);
+					rectangle_width,
+					common_height);
 
 		//draw the triangle
 		ctx.beginPath();
-		ctx.moveTo(x_triangle - box_margin_x, y_triangle);
-		ctx.lineTo(x_triangle - box_margin_x + arrow_width, y_triangle + height_triangle / 2);
-		ctx.lineTo(x_triangle - box_margin_x, y_triangle + height_triangle);
+		ctx.moveTo(x_triangle, y_triangle);
+		ctx.lineTo(x_triangle + triangle_width, y_triangle + common_height / 2);
+		ctx.lineTo(x_triangle, y_triangle + common_height);
 		ctx.fill();
 
 		// draw the text
 		ctx.fillStyle = this.get_option(chart, "font_color");
-		ctx.fillText(text, x_rectangle - box_margin_x + padding, y_rectangle + padding);
+		ctx.fillText(text, x_rectangle + rectangle_width / 2, y_rectangle + common_height / 2 - font_size / 2);
 
 		ctx.restore();
+
+	},
+
+	draw_upper_label: function(chart, width_current, text, tooltip_position) {
+		var ctx = chart.ctx;
+
+		var rectangle_width = width_current / 2;
+		var padding = rectangle_width / 5;
+		var font_size = rectangle_width / 3;
+
+		ctx.font = Chart.helpers.fontString(font_size, this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
+		ctx.textBaseline = "top";
+		ctx.textAlign = "center";
+
+		var common_height = font_size + padding * 2;
+		var margin_bottom = common_height / 4;
+
+		ctx.save();
+
+		// draw the box		
+		ctx.fillStyle = this.get_option(chart, "background_color");
+		ctx.fillRect(tooltip_position.x - rectangle_width / 2,
+					tooltip_position.y - common_height - margin_bottom,
+					rectangle_width,
+					common_height);
+
+		// draw the text
+		ctx.fillStyle = this.get_option(chart, "font_color");
+		ctx.fillText(text, tooltip_position.x, tooltip_position.y - font_size - padding - margin_bottom);
+
+		ctx.restore();
+
+	},
+
+	calculate_single_label: function(chart, text, element_current, element_previous) {
+
+		var x_previous = element_previous.getCenterPoint().x + element_previous._view.width/2;
+		var x_current = element_current.getCenterPoint().x - element_current._view.width/2;
+
+		if (x_current - x_previous > this.get_option(chart, "min_width_upper_label") && !this.get_option(chart, "force_upper_label")) {
+			this.draw_left_label(chart, text, x_previous, x_current, element_current.getCenterPoint().y);
+		} else if (this.get_option(chart, "force_upper_label") || this.get_option(chart, "allow_upper_label")) {
+			this.draw_upper_label(chart, element_current._view.width, text, element_current.tooltipPosition());
+		}
 
 	},
 
@@ -81,16 +119,17 @@ Chart.plugins.register({
 
 				var first_value = chart.data.datasets[0].data[0];
 
+				var element_previous;
 				meta.data.forEach(function(element, index) {
 
 					if (index > 0) {
 						var value = Math.round(chart.data.datasets[0].data[index] * 100 / first_value);
-
 						if (value > 0 || that.get_option(chart, "show_zeros")) {
-							that.draw_single_label(chart, value + "%", element);
+							that.calculate_single_label(chart, value + "%", element, element_previous);
 						}
-
 					}
+
+					element_previous = element;
 				});
 			}
 		}

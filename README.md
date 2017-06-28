@@ -44,7 +44,7 @@ new Chart($("#chart"), {
 
 ### Current options
 
-They're setted in the **label_options** object:
+They're setted in the **label_options** object with these default values:
 
 ```markdown
 label_options: {
@@ -53,15 +53,35 @@ label_options: {
   font_family: "Arial",
   font_color: "white",
   background_color: "#FFBA4B",
-  default_width: 1150,
-  default_font_size: 20,
-  default_padding: 10,
-  default_arrow_width: 20,
-  show_zeros: true
+  rectangle_width_scale_factor: 5,
+  show_zeros: true,
+  min_width_upper_label: 150,
+  allow_upper_label: true,
+  force_upper_label: false,
 }
 ```
 
+#### rectangle_width_scale_factor
+
+width for each label rectangle = width between two bars / *rectangle_width_scale_factor*
+
+#### show_zeros
+
+If true will show the labels with a 0% value (otherwise will hide them).
+
+#### min_width_upper_label
+
+If the width between two bars is smaller than this value the labels will appear **over** them.
+
+#### allow_upper_label
+
+If setted to false, the labels **over** the bars won't appear (it won't draw anything).
+
+#### force_upper_label
+
+If true will always show the labels **over** the bars (this will override the *allow_upper_label* option).
+
+
 ### Known issues
 
-- A small *barPercentage* is recommended to avoid some overlapping while drawing.
-- The label value can be setted only as a *% difference* between the first and the current values. No other options are available.
+- The plugin can't handle more than one dataset and it just won't draw anything.

@@ -10,7 +10,7 @@ Written by [Albert Gonzalez](http://albertgonzalez.coffee) and released under [t
 
 Add the **chartjs-plugin-funnel-label.js** and use the **funnel_labels** options to enable the plugin and override the default values.
 
-It works only in **bar charts** with one dataset and will show the % difference between the **first** bar and the **current** one.
+It works only in **bar charts** with one dataset and will show the % difference between **each bar**.
 
 ```markdown
 new Chart($("#chart"), {

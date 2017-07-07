@@ -39,7 +39,7 @@ Chart.plugins.register({
 		}
 
 		// Arrow (triangle)
-		var x_triangle = x_rectangle + rectangle_width - 1;
+		var x_triangle = x_rectangle + padding_x / 2 + rectangle_width - 1;
 		var y_triangle = y_rectangle;
 
 		ctx.save();
@@ -48,7 +48,7 @@ Chart.plugins.register({
 		ctx.fillStyle = this.get_option(chart, "background_color");
 		ctx.fillRect(x_rectangle - padding_x / 2,
 					y_rectangle,
-					rectangle_width + padding_x / 2,
+					rectangle_width + padding_x,
 					common_height);
 
 		//draw the triangle
@@ -70,28 +70,29 @@ Chart.plugins.register({
 		var ctx = chart.ctx;
 
 		var rectangle_width = width_current / 2;
-		var padding = rectangle_width / 5;
 		var font_size = rectangle_width / 3;
+		var padding_x = text.length * 3;
+		var padding_y = rectangle_width / 5;
 
 		ctx.font = Chart.helpers.fontString(font_size, this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
 		ctx.textBaseline = "top";
 		ctx.textAlign = "center";
 
-		var common_height = font_size + padding * 2;
+		var common_height = font_size + padding_y * 2;
 		var margin_bottom = common_height / 4;
 
 		ctx.save();
 
 		// draw the box		
 		ctx.fillStyle = this.get_option(chart, "background_color");
-		ctx.fillRect(tooltip_position.x - rectangle_width / 2,
+		ctx.fillRect(tooltip_position.x - rectangle_width / 2 - padding_x / 2,
 					tooltip_position.y - common_height - margin_bottom,
-					rectangle_width,
+					rectangle_width + padding_x,
 					common_height);
 
 		// draw the text
 		ctx.fillStyle = this.get_option(chart, "font_color");
-		ctx.fillText(text, tooltip_position.x, tooltip_position.y - font_size - padding - margin_bottom);
+		ctx.fillText(text, tooltip_position.x, tooltip_position.y - font_size - padding_y - margin_bottom);
 
 		ctx.restore();
 

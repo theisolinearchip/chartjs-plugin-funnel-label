@@ -8,6 +8,7 @@ Chart.plugins.register({
 		background_color: "#FFBA4B",
 		rectangle_width_scale_factor: 5,
 		show_zeros: true,
+		decimals: 1,
 		min_width_upper_label: 150,
 		allow_upper_label: true,
 		force_upper_label: false,
@@ -20,14 +21,15 @@ Chart.plugins.register({
 		var rectangle_width = available_width / this.get_option(chart, "rectangle_width_scale_factor");
 		var triangle_width = rectangle_width / 3;
 
-		var padding = rectangle_width / 5;
 		var font_size = rectangle_width / 3;
+		var padding_x = text.length * 3;
+		var padding_y = rectangle_width / 5;
 
 		ctx.font = Chart.helpers.fontString(font_size, this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
 		ctx.textBaseline = "top";
 		ctx.textAlign = "center";
 
-		var common_height = font_size + padding * 2;
+		var common_height = font_size + padding_y * 2;
 		var x_rectangle = x_previous + (available_width / 2) - ((rectangle_width + triangle_width) / 2);
 		var y_rectangle = y_current - common_height / 2;
 
@@ -44,9 +46,9 @@ Chart.plugins.register({
 
 		// draw the box		
 		ctx.fillStyle = this.get_option(chart, "background_color");
-		ctx.fillRect(x_rectangle,
+		ctx.fillRect(x_rectangle - padding_x / 2,
 					y_rectangle,
-					rectangle_width,
+					rectangle_width + padding_x / 2,
 					common_height);
 
 		//draw the triangle
@@ -117,13 +119,21 @@ Chart.plugins.register({
 
 			if (!meta.hidden && chart.data.datasets.length == 1) {
 
-				var first_value = chart.data.datasets[0].data[0];
+				var decimals = 1;
+				var tmp = this.get_option(chart, "decimals");
+				if (tmp > 0) {
+					while (tmp > 0) {
+						decimals *= 10;
+						--tmp;
+					}
+				}
 
 				var element_previous;
 				meta.data.forEach(function(element, index) {
 
 					if (index > 0) {
-						var value = Math.round(chart.data.datasets[0].data[index] * 100 / first_value);
+						var previous_value = chart.data.datasets[0].data[index - 1];
+						var value = Math.round( (chart.data.datasets[0].data[index] * 100 / previous_value) * decimals ) / decimals;
 						if (value > 0 || that.get_option(chart, "show_zeros")) {
 							that.calculate_single_label(chart, value + "%", element, element_previous);
 						}

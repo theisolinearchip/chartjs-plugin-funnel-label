@@ -134,9 +134,12 @@ Chart.plugins.register({
 
 					if (index > 0) {
 						var previous_value = chart.data.datasets[0].data[index - 1];
-						var value = Math.round( (chart.data.datasets[0].data[index] * 100 / previous_value) * decimals ) / decimals;
-						if (value > 0 || that.get_option(chart, "show_zeros")) {
-							that.calculate_single_label(chart, value + "%", element, element_previous);
+
+						if (previous_value != 0) {
+							var value = Math.round( (chart.data.datasets[0].data[index] * 100 / previous_value) * decimals ) / decimals;
+							if (value > 0 || that.get_option(chart, "show_zeros")) {
+								that.calculate_single_label(chart, value + "%", element, element_previous);
+							}
 						}
 					}
 

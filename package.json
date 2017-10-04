@@ -1,0 +1,28 @@
+{
+  "name": "chartjs-plugin-funnel-labels",
+  "version": "1.0.1",
+  "description": "Plugin for Chart.js to add labels between columns to show the % progress in the same dataset",
+  "main": "chartjs-plugin-funnel-labels.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koopaconan/chartjs-plugin-funnel-label.git"
+  },
+  "keywords": [
+    "chartjs",
+    "funnel",
+    "chart",
+    "label"
+  ],
+  "author": "Albert Gonzalez",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/koopaconan/chartjs-plugin-funnel-label/issues"
+  },
+  "homepage": "https://github.com/koopaconan/chartjs-plugin-funnel-label#readme"
+}

@@ -1,6 +1,6 @@
 {
   "name": "chartjs-plugin-funnel-labels",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Plugin for Chart.js to add labels between columns to show the % progress in the same dataset",
   "main": "chartjs-plugin-funnel-labels.js",
   "directories": {

@@ -44,7 +44,7 @@ new Chart($("#chart"), {
 
 ### Current options
 
-They're setted in the **label_options** object with these default values:
+They're set in the **label_options** object with these default values:
 
 ```markdown
 label_options: {
@@ -75,7 +75,7 @@ If the width between two bars is smaller than this value the labels will appear 
 
 #### allow_upper_label
 
-If setted to false, the labels **over** the bars won't appear (it won't draw anything).
+If set to false, the labels **over** the bars won't appear (it won't draw anything).
 
 #### force_upper_label
 

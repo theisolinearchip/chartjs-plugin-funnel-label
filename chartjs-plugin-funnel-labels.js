@@ -12,11 +12,12 @@ Chart.plugins.register({
 		min_width_upper_label: 150,
 		allow_upper_label: true,
 		force_upper_label: false,
-    border_color: '#FFBA4B',
+    border_color: "#FFBA4B",
     border_colors: [],
 		sub_text: null,
-    sub_text_size: 10,
-		text_align: "center"
+		sub_text_style: "normal",
+		text_align: "center",
+    label_centered: true
 	},
 
 	draw_left_label: function(chart, text, x_previous, x_current, y_current, labelIndex) {
@@ -28,7 +29,7 @@ Chart.plugins.register({
 
 		var font_size = rectangle_width / 3;
 		var padding_x = text.length * 3;
-		var padding_y = rectangle_width / 5;
+		var padding_y = rectangle_width / 4;
 
 		ctx.font = Chart.helpers.fontString(font_size, this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
 		ctx.textBaseline = "top";
@@ -49,7 +50,7 @@ Chart.plugins.register({
 
 		ctx.save();
 
-		// draw the box		
+		// draw the box
 		ctx.fillStyle = this.get_option(chart, "background_color");
 		ctx.fillRect(x_rectangle - padding_x / 2,
 					y_rectangle,
@@ -87,16 +88,15 @@ Chart.plugins.register({
 		// draw the text
 		ctx.fillStyle = this.get_option(chart, "font_color");
     // Calculate position of texts
-    const subText = this.get_option(chart, "sub_text");
+    var subText = this.get_option(chart, "sub_text");
 
     var textXPosition;
-    console.log(this.get_option(chart, "text_align"));
     switch(this.get_option(chart, "text_align")) {
-			case 'center': {
+			case "center": {
 				textXPosition = x_rectangle + rectangle_width / 2;
 				break;
 			}
-			case 'right' : {
+			case "right" : {
         textXPosition = x_rectangle - rectangle_width / 2;
         break;
 			}
@@ -105,12 +105,11 @@ Chart.plugins.register({
         break;
 			}
 		}
-
     if(subText) {
-      const subTextSize = this.get_option(chart, "sub_text_size");
+			var subTextSize = rectangle_width / 5;
       ctx.fillText(text, textXPosition, y_rectangle + common_height / 2 - font_size / 2 - subTextSize / 2);
-      ctx.font = Chart.helpers.fontString(this.get_option(chart, "sub_text_size"), this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
-      ctx.fillText(subText, textXPosition, y_rectangle + common_height / 2 + subTextSize / 2);
+      ctx.font = Chart.helpers.fontString(subTextSize, this.get_option(chart, "sub_text_style"), this.get_option(chart, "font_family"));
+      ctx.fillText(subText, textXPosition, y_rectangle + common_height / 2 + subTextSize / 3);
     } else {
       ctx.fillText(text, textXPosition, y_rectangle + common_height / 2 - font_size / 2);
     }
@@ -136,7 +135,7 @@ Chart.plugins.register({
 
 		ctx.save();
 
-		// draw the box		
+		// draw the box
 		ctx.fillStyle = this.get_option(chart, "background_color");
 		ctx.fillRect(tooltip_position.x - rectangle_width / 2 - padding_x / 2,
 					tooltip_position.y - common_height - margin_bottom,
@@ -157,7 +156,8 @@ Chart.plugins.register({
 		var x_current = element_current.getCenterPoint().x - element_current._view.width/2;
 
 		if (x_current - x_previous > this.get_option(chart, "min_width_upper_label") && !this.get_option(chart, "force_upper_label")) {
-			this.draw_left_label(chart, text, x_previous, x_current, element_current.getCenterPoint().y, labelIndex);
+      var y_label_position = this.get_option(chart, "label_centered") ? element_current.getCenterPoint().y : element_current.getCenterPoint().y - element_current.height() / 2;
+			this.draw_left_label(chart, text, x_previous, x_current, y_label_position, labelIndex);
 		} else if (this.get_option(chart, "force_upper_label") || this.get_option(chart, "allow_upper_label")) {
 			this.draw_upper_label(chart, element_current._view.width, text, element_current.tooltipPosition());
 		}

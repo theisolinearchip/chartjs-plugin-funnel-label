@@ -14,6 +14,9 @@ Chart.plugins.register({
 		force_upper_label: false,
     border_color: '#FFBA4B',
     border_colors: [],
+		sub_text: null,
+    sub_text_size: 10,
+		text_align: "center"
 	},
 
 	draw_left_label: function(chart, text, x_previous, x_current, y_current, labelIndex) {
@@ -29,7 +32,7 @@ Chart.plugins.register({
 
 		ctx.font = Chart.helpers.fontString(font_size, this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
 		ctx.textBaseline = "top";
-		ctx.textAlign = "center";
+		ctx.textAlign = this.get_option(chart, "text_align");
 
 		var common_height = font_size + padding_y * 2;
 		var x_rectangle = x_previous + (available_width / 2) - ((rectangle_width + triangle_width) / 2);
@@ -83,9 +86,36 @@ Chart.plugins.register({
 
 		// draw the text
 		ctx.fillStyle = this.get_option(chart, "font_color");
-		ctx.fillText(text, x_rectangle + rectangle_width / 2, y_rectangle + common_height / 2 - font_size / 2);
+    // Calculate position of texts
+    const subText = this.get_option(chart, "sub_text");
 
-		ctx.restore();
+    var textXPosition;
+    console.log(this.get_option(chart, "text_align"));
+    switch(this.get_option(chart, "text_align")) {
+			case 'center': {
+				textXPosition = x_rectangle + rectangle_width / 2;
+				break;
+			}
+			case 'right' : {
+        textXPosition = x_rectangle - rectangle_width / 2;
+        break;
+			}
+			default: {
+        textXPosition = x_rectangle;
+        break;
+			}
+		}
+
+    if(subText) {
+      const subTextSize = this.get_option(chart, "sub_text_size");
+      ctx.fillText(text, textXPosition, y_rectangle + common_height / 2 - font_size / 2 - subTextSize / 2);
+      ctx.font = Chart.helpers.fontString(this.get_option(chart, "sub_text_size"), this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
+      ctx.fillText(subText, textXPosition, y_rectangle + common_height / 2 + subTextSize / 2);
+    } else {
+      ctx.fillText(text, textXPosition, y_rectangle + common_height / 2 - font_size / 2);
+    }
+
+    ctx.restore();
 
 	},
 

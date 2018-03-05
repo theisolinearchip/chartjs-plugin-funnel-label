@@ -12,9 +12,15 @@ Chart.plugins.register({
 		min_width_upper_label: 150,
 		allow_upper_label: true,
 		force_upper_label: false,
+    border_color: "#FFBA4B",
+    border_colors: [],
+		sub_text: null,
+		sub_text_style: "normal",
+		text_align: "center",
+    label_centered: true
 	},
 
-	draw_left_label: function(chart, text, x_previous, x_current, y_current) {
+	draw_left_label: function(chart, text, x_previous, x_current, y_current, labelIndex) {
 		var ctx = chart.ctx;
 		var available_width = x_current - x_previous;
 
@@ -23,11 +29,11 @@ Chart.plugins.register({
 
 		var font_size = rectangle_width / 3;
 		var padding_x = text.length * 3;
-		var padding_y = rectangle_width / 5;
+		var padding_y = rectangle_width / 4;
 
 		ctx.font = Chart.helpers.fontString(font_size, this.get_option(chart, "font_style"), this.get_option(chart, "font_family"));
 		ctx.textBaseline = "top";
-		ctx.textAlign = "center";
+		ctx.textAlign = this.get_option(chart, "text_align");
 
 		var common_height = font_size + padding_y * 2;
 		var x_rectangle = x_previous + (available_width / 2) - ((rectangle_width + triangle_width) / 2);
@@ -44,25 +50,71 @@ Chart.plugins.register({
 
 		ctx.save();
 
-		// draw the box		
+		// draw the box
 		ctx.fillStyle = this.get_option(chart, "background_color");
 		ctx.fillRect(x_rectangle - padding_x / 2,
 					y_rectangle,
 					rectangle_width + padding_x,
 					common_height);
 
+		// determine border color - ALLOWS GRADIENT!
+    var borderColors = this.get_option(chart, "border_colors");
+    if(borderColors.length > 1 && borderColors[labelIndex]) {
+      // render gradient
+      var borderGradient = ctx.createLinearGradient(x_rectangle, 0, x_rectangle + rectangle_width + triangle_width, 0);
+      borderGradient.addColorStop("0", borderColors[labelIndex - 1]);
+      borderGradient.addColorStop("1", borderColors[labelIndex]);
+      ctx.strokeStyle = borderGradient;
+    } else if(borderColors.length === 1) {
+      ctx.strokeStyle = borderColors[0];
+    } else {
+      // render borderColor
+      ctx.strokeStyle = this.get_option(chart, "border_color");
+    }
+    ctx.strokeRect(x_rectangle - padding_x / 2,
+      y_rectangle,
+      rectangle_width + padding_x,
+      common_height);
+
 		//draw the triangle
 		ctx.beginPath();
+    ctx.lineWidth = 2;
 		ctx.moveTo(x_triangle, y_triangle);
 		ctx.lineTo(x_triangle + triangle_width, y_triangle + common_height / 2);
 		ctx.lineTo(x_triangle, y_triangle + common_height);
+    ctx.stroke();
 		ctx.fill();
 
 		// draw the text
 		ctx.fillStyle = this.get_option(chart, "font_color");
-		ctx.fillText(text, x_rectangle + rectangle_width / 2, y_rectangle + common_height / 2 - font_size / 2);
+    // Calculate position of texts
+    var subText = this.get_option(chart, "sub_text");
 
-		ctx.restore();
+    var textXPosition;
+    switch(this.get_option(chart, "text_align")) {
+			case "center": {
+				textXPosition = x_rectangle + rectangle_width / 2;
+				break;
+			}
+			case "right" : {
+        textXPosition = x_rectangle - rectangle_width / 2;
+        break;
+			}
+			default: {
+        textXPosition = x_rectangle;
+        break;
+			}
+		}
+    if(subText) {
+			var subTextSize = rectangle_width / 5;
+      ctx.fillText(text, textXPosition, y_rectangle + common_height / 2 - font_size / 2 - subTextSize / 2);
+      ctx.font = Chart.helpers.fontString(subTextSize, this.get_option(chart, "sub_text_style"), this.get_option(chart, "font_family"));
+      ctx.fillText(subText, textXPosition, y_rectangle + common_height / 2 + subTextSize / 3);
+    } else {
+      ctx.fillText(text, textXPosition, y_rectangle + common_height / 2 - font_size / 2);
+    }
+
+    ctx.restore();
 
 	},
 
@@ -83,7 +135,7 @@ Chart.plugins.register({
 
 		ctx.save();
 
-		// draw the box		
+		// draw the box
 		ctx.fillStyle = this.get_option(chart, "background_color");
 		ctx.fillRect(tooltip_position.x - rectangle_width / 2 - padding_x / 2,
 					tooltip_position.y - common_height - margin_bottom,
@@ -98,13 +150,14 @@ Chart.plugins.register({
 
 	},
 
-	calculate_single_label: function(chart, text, element_current, element_previous) {
+	calculate_single_label: function(chart, text, element_current, element_previous, labelIndex) {
 
 		var x_previous = element_previous.getCenterPoint().x + element_previous._view.width/2;
 		var x_current = element_current.getCenterPoint().x - element_current._view.width/2;
 
 		if (x_current - x_previous > this.get_option(chart, "min_width_upper_label") && !this.get_option(chart, "force_upper_label")) {
-			this.draw_left_label(chart, text, x_previous, x_current, element_current.getCenterPoint().y);
+      var y_label_position = this.get_option(chart, "label_centered") ? element_current.getCenterPoint().y : element_current.getCenterPoint().y - element_current.height() / 2;
+			this.draw_left_label(chart, text, x_previous, x_current, y_label_position, labelIndex);
 		} else if (this.get_option(chart, "force_upper_label") || this.get_option(chart, "allow_upper_label")) {
 			this.draw_upper_label(chart, element_current._view.width, text, element_current.tooltipPosition());
 		}
@@ -138,7 +191,7 @@ Chart.plugins.register({
 						if (previous_value != 0) {
 							var value = Math.round( (chart.data.datasets[0].data[index] * 100 / previous_value) * decimals ) / decimals;
 							if (value > 0 || that.get_option(chart, "show_zeros")) {
-								that.calculate_single_label(chart, value + "%", element, element_previous);
+								that.calculate_single_label(chart, value + "%", element, element_previous, index);
 							}
 						}
 					}

@@ -57,11 +57,21 @@
 						scales: {
 							yAxes: [{
 								ticks: {
-									beginAtZero: true
+									beginAtZero: true,
+									fontColor: "blue",
+								},
+								gridLines: {
+									color: "green",
 								}
 							}],
 							xAxes: [{
-								barPercentage: 0.3
+								barPercentage: 0.3,
+								ticks: {
+									fontColor: "purple",
+								},
+                				gridLines: {
+									color: "orange",
+                				}
 							}]
 						},
 						funnel_labels: {
@@ -70,6 +80,11 @@
 							//force_upper_label: true,
 							//allow_upper_label: false,
 							//rectangle_width_scale_factor: 2,
+						},
+						legend: {
+							labels: {
+								fontColor: "red",
+							}
 						}
 					}
 				});
